@@ -1,0 +1,12 @@
+<RCC>
+  <qresource>
+    <file>images/dashboardsmall2.png</file>
+    <file>images/excel.png</file>
+    <file>images/financessmall2.png</file>
+    <file>images/studentssmall2.png</file>
+    <file>images/financessmall1.png</file>
+    <file>images/studentssmall1.png</file>
+    <file>images/dashboardsmall1.png</file>
+    <file>images/Logo.png</file>
+  </qresource>
+</RCC>
