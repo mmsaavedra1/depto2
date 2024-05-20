@@ -145,7 +145,7 @@ QPushButton:checked{
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QFrame" name="widget_datos_evaluacion">
@@ -182,7 +182,7 @@ QPushButton:checked{
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>31</y>
+         <y>36</y>
          <width>215</width>
          <height>20</height>
         </rect>
@@ -212,7 +212,7 @@ QPushButton:checked{
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>55</y>
+         <y>60</y>
          <width>131</width>
          <height>16</height>
         </rect>
@@ -230,7 +230,7 @@ QPushButton:checked{
        <property name="geometry">
         <rect>
          <x>130</x>
-         <y>55</y>
+         <y>60</y>
          <width>91</width>
          <height>21</height>
         </rect>
