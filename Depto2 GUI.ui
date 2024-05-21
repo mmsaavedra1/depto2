@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1132</width>
-    <height>690</height>
+    <height>703</height>
    </rect>
   </property>
   <property name="font">
@@ -21,7 +21,7 @@
     <property name="geometry">
      <rect>
       <x>435</x>
-      <y>20</y>
+      <y>10</y>
       <width>361</width>
       <height>20</height>
      </rect>
@@ -40,7 +40,7 @@
     <property name="geometry">
      <rect>
       <x>435</x>
-      <y>40</y>
+      <y>30</y>
       <width>321</width>
       <height>20</height>
      </rect>
@@ -58,7 +58,7 @@
     <property name="geometry">
      <rect>
       <x>435</x>
-      <y>60</y>
+      <y>50</y>
       <width>271</width>
       <height>16</height>
      </rect>
@@ -71,7 +71,7 @@
     <property name="geometry">
      <rect>
       <x>360</x>
-      <y>90</y>
+      <y>80</y>
       <width>431</width>
       <height>44</height>
      </rect>
@@ -139,9 +139,9 @@ QPushButton:checked{
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>140</y>
+      <y>130</y>
       <width>1121</width>
-      <height>531</height>
+      <height>541</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -151,10 +151,10 @@ QPushButton:checked{
      <widget class="QFrame" name="widget_datos_evaluacion">
       <property name="geometry">
        <rect>
-        <x>220</x>
-        <y>380</y>
-        <width>711</width>
-        <height>141</height>
+        <x>350</x>
+        <y>390</y>
+        <width>451</width>
+        <height>151</height>
        </rect>
       </property>
       <property name="frameShape">
@@ -164,14 +164,14 @@ QPushButton:checked{
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>5</y>
-         <width>111</width>
+         <y>50</y>
+         <width>81</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <bold>true</bold>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
@@ -181,57 +181,37 @@ QPushButton:checked{
       <widget class="QComboBox" name="lista_comunas">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>36</y>
-         <width>215</width>
+         <x>100</x>
+         <y>50</y>
+         <width>121</width>
          <height>20</height>
         </rect>
        </property>
-       <item>
-        <property name="text">
-         <string>Ñuñoa</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Las Condes</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Providencia</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Quinta Normal</string>
-        </property>
-       </item>
       </widget>
       <widget class="QLabel" name="etiq_precio_2">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>60</y>
-         <width>131</width>
+         <y>70</y>
+         <width>81</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <bold>true</bold>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
-        <string>Precio Proyecto</string>
+        <string>Precio [UF]</string>
        </property>
       </widget>
       <widget class="QLineEdit" name="precio_2">
        <property name="geometry">
         <rect>
-         <x>130</x>
-         <y>60</y>
-         <width>91</width>
+         <x>100</x>
+         <y>70</y>
+         <width>121</width>
          <height>21</height>
         </rect>
        </property>
@@ -239,7 +219,7 @@ QPushButton:checked{
       <widget class="QLineEdit" name="plazo">
        <property name="geometry">
         <rect>
-         <x>600</x>
+         <x>350</x>
          <y>51</y>
          <width>81</width>
          <height>20</height>
@@ -249,7 +229,7 @@ QPushButton:checked{
       <widget class="QLineEdit" name="cae">
        <property name="geometry">
         <rect>
-         <x>600</x>
+         <x>350</x>
          <y>70</y>
          <width>81</width>
          <height>20</height>
@@ -259,7 +239,7 @@ QPushButton:checked{
       <widget class="QLineEdit" name="pie">
        <property name="geometry">
         <rect>
-         <x>600</x>
+         <x>350</x>
          <y>30</y>
          <width>81</width>
          <height>21</height>
@@ -269,7 +249,7 @@ QPushButton:checked{
       <widget class="QLabel" name="etiq_plazo">
        <property name="geometry">
         <rect>
-         <x>510</x>
+         <x>260</x>
          <y>50</y>
          <width>81</width>
          <height>20</height>
@@ -287,8 +267,8 @@ QPushButton:checked{
       <widget class="QLabel" name="titutlo">
        <property name="geometry">
         <rect>
-         <x>510</x>
-         <y>5</y>
+         <x>260</x>
+         <y>10</y>
          <width>191</width>
          <height>16</height>
         </rect>
@@ -299,13 +279,13 @@ QPushButton:checked{
         </font>
        </property>
        <property name="text">
-        <string>Datos de crédito hipotecario</string>
+        <string>Crédito Hipotecario</string>
        </property>
       </widget>
       <widget class="QLabel" name="etiq_pie">
        <property name="geometry">
         <rect>
-         <x>510</x>
+         <x>260</x>
          <y>30</y>
          <width>71</width>
          <height>16</height>
@@ -323,7 +303,7 @@ QPushButton:checked{
       <widget class="QLabel" name="etiq_cae">
        <property name="geometry">
         <rect>
-         <x>510</x>
+         <x>260</x>
          <y>70</y>
          <width>71</width>
          <height>16</height>
@@ -341,8 +321,8 @@ QPushButton:checked{
       <widget class="QPushButton" name="boton_generar_evaluacion">
        <property name="geometry">
         <rect>
-         <x>150</x>
-         <y>110</y>
+         <x>10</x>
+         <y>120</y>
          <width>431</width>
          <height>31</height>
         </rect>
@@ -358,18 +338,18 @@ QPushButton:checked{
 }</string>
        </property>
        <property name="text">
-        <string>Generar Información</string>
+        <string>Generar Evaluación</string>
        </property>
        <property name="checkable">
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QLabel" name="etiq_cae_7">
+      <widget class="QLabel" name="etiq_precio_4">
        <property name="geometry">
         <rect>
-         <x>270</x>
-         <y>70</y>
-         <width>71</width>
+         <x>10</x>
+         <y>90</y>
+         <width>81</width>
          <height>16</height>
         </rect>
        </property>
@@ -379,52 +359,55 @@ QPushButton:checked{
         </font>
        </property>
        <property name="text">
-        <string>Carac 3</string>
+        <string>Arriendo [$]</string>
        </property>
       </widget>
-      <widget class="QLabel" name="etiq_pie_3">
+      <widget class="QLineEdit" name="arriendo_proyecto">
        <property name="geometry">
         <rect>
-         <x>270</x>
-         <y>30</y>
-         <width>71</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>Carac 1</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="plazo_3">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>51</y>
-         <width>81</width>
-         <height>20</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="pie_3">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>30</y>
-         <width>81</width>
+         <x>100</x>
+         <y>90</y>
+         <width>121</width>
          <height>21</height>
         </rect>
        </property>
       </widget>
-      <widget class="QLabel" name="titutlo_3">
+      <widget class="QLabel" name="etiq_precio_5">
        <property name="geometry">
         <rect>
-         <x>270</x>
-         <y>5</y>
+         <x>10</x>
+         <y>30</y>
+         <width>81</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Nombre</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="nombre_proyecto">
+       <property name="geometry">
+        <rect>
+         <x>100</x>
+         <y>30</y>
+         <width>121</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="titutlo_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
          <width>191</width>
          <height>16</height>
         </rect>
@@ -435,16 +418,16 @@ QPushButton:checked{
         </font>
        </property>
        <property name="text">
-        <string>Caracteristicas Proyecto</string>
+        <string>Datos Proyecto</string>
        </property>
       </widget>
-      <widget class="QLabel" name="etiq_plazo_3">
+      <widget class="QLabel" name="etiq_cae_4">
        <property name="geometry">
         <rect>
-         <x>270</x>
-         <y>50</y>
-         <width>81</width>
-         <height>20</height>
+         <x>260</x>
+         <y>90</y>
+         <width>71</width>
+         <height>16</height>
         </rect>
        </property>
        <property name="font">
@@ -453,25 +436,28 @@ QPushButton:checked{
         </font>
        </property>
        <property name="text">
-        <string>Carac 2</string>
+        <string>UF/CLP</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="cae_3">
+      <widget class="QLineEdit" name="uf">
        <property name="geometry">
         <rect>
-         <x>360</x>
-         <y>70</y>
+         <x>350</x>
+         <y>90</y>
          <width>81</width>
          <height>20</height>
         </rect>
        </property>
+       <property name="text">
+        <string/>
+       </property>
       </widget>
      </widget>
-     <widget class="QTableWidget" name="tabla_evaluacion">
+     <widget class="QTableWidget" name="tabla_dfl2">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>330</y>
+        <y>340</y>
         <width>551</width>
         <height>51</height>
        </rect>
@@ -484,7 +470,7 @@ QPushButton:checked{
       </attribute>
       <column>
        <property name="text">
-        <string>Año Venta</string>
+        <string>Año</string>
        </property>
       </column>
       <column>
@@ -504,12 +490,12 @@ QPushButton:checked{
       </column>
       <column>
        <property name="text">
-        <string>R. Amortizacion</string>
+        <string>R. Plusvalia</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>R. Flujo</string>
+        <string>R. Amortizacion</string>
        </property>
       </column>
       <column>
@@ -518,7 +504,7 @@ QPushButton:checked{
        </property>
       </column>
      </widget>
-     <widget class="QChartView" name="grafico_evaluacion">
+     <widget class="QChartView" name="grafico_dfl2">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -528,7 +514,7 @@ QPushButton:checked{
        </rect>
       </property>
      </widget>
-     <widget class="QChartView" name="grafico_evaluacion_3">
+     <widget class="QChartView" name="grafico_27bis">
       <property name="geometry">
        <rect>
         <x>580</x>
@@ -538,11 +524,11 @@ QPushButton:checked{
        </rect>
       </property>
      </widget>
-     <widget class="QTableWidget" name="tabla_evaluacion_3">
+     <widget class="QTableWidget" name="tabla_27bis">
       <property name="geometry">
        <rect>
         <x>580</x>
-        <y>330</y>
+        <y>340</y>
         <width>551</width>
         <height>51</height>
        </rect>
@@ -555,7 +541,7 @@ QPushButton:checked{
       </attribute>
       <column>
        <property name="text">
-        <string>Año Venta</string>
+        <string>Año</string>
        </property>
       </column>
       <column>
@@ -575,12 +561,12 @@ QPushButton:checked{
       </column>
       <column>
        <property name="text">
-        <string>R. Amortizacion</string>
+        <string>R. Plusvalia</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>R. Flujo</string>
+        <string>R. Amortizacion</string>
        </property>
       </column>
       <column>
@@ -588,15 +574,51 @@ QPushButton:checked{
         <string>Utilidades</string>
        </property>
       </column>
+     </widget>
+     <widget class="QLabel" name="titutlo_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>323</y>
+        <width>561</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Detalle de venta, máxima utilidad [DFL2]</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="titutlo_4">
+      <property name="geometry">
+       <rect>
+        <x>580</x>
+        <y>323</y>
+        <width>271</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>Detalle de venta, máxima utilidad [27BIS]</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="page_2">
      <widget class="QFrame" name="comunas_2">
       <property name="geometry">
        <rect>
-        <x>360</x>
-        <y>330</y>
-        <width>441</width>
+        <x>350</x>
+        <y>340</y>
+        <width>451</width>
         <height>201</height>
        </rect>
       </property>
@@ -630,26 +652,9 @@ QPushButton:checked{
          <height>21</height>
         </rect>
        </property>
-       <item>
-        <property name="text">
-         <string>Ñuñoa</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Las Condes</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Providencia</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Quinta Normal</string>
-        </property>
-       </item>
+       <property name="editable">
+        <bool>false</bool>
+       </property>
       </widget>
       <widget class="QLabel" name="etiq_lista_comunas_3">
        <property name="geometry">
@@ -678,26 +683,9 @@ QPushButton:checked{
          <height>21</height>
         </rect>
        </property>
-       <item>
-        <property name="text">
-         <string>Las Condes</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Providencia</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Quinta Normal</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Ñuñoa</string>
-        </property>
-       </item>
+       <property name="editable">
+        <bool>false</bool>
+       </property>
       </widget>
       <widget class="QComboBox" name="lista_comunas_4">
        <property name="geometry">
@@ -708,26 +696,9 @@ QPushButton:checked{
          <height>21</height>
         </rect>
        </property>
-       <item>
-        <property name="text">
-         <string>Quinta Normal</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Ñuñoa</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Las Condes</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Providencia</string>
-        </property>
-       </item>
+       <property name="editable">
+        <bool>false</bool>
+       </property>
       </widget>
       <widget class="QLabel" name="etiq_lista_comunas_4">
        <property name="geometry">
@@ -804,6 +775,9 @@ QPushButton:checked{
           <height>21</height>
          </rect>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
        </widget>
        <widget class="QLineEdit" name="precio_4">
         <property name="geometry">
@@ -813,6 +787,9 @@ QPushButton:checked{
           <width>61</width>
           <height>21</height>
          </rect>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
        <widget class="QLabel" name="etiq_cae_3">
@@ -839,8 +816,8 @@ QPushButton:checked{
       <property name="geometry">
        <rect>
         <x>370</x>
-        <y>490</y>
-        <width>431</width>
+        <y>510</y>
+        <width>201</width>
         <height>31</height>
        </rect>
       </property>
@@ -855,20 +832,32 @@ QPushButton:checked{
 }</string>
       </property>
       <property name="text">
-       <string>Generar Información</string>
+       <string>Listar Proyectos</string>
       </property>
       <property name="checkable">
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QTableWidget" name="tabla_evaluacion_4">
+     <widget class="QTableWidget" name="tabla_proyectos">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>200</x>
         <y>10</y>
-        <width>1051</width>
+        <width>801</width>
         <height>321</height>
        </rect>
+      </property>
+      <property name="showGrid">
+       <bool>true</bool>
+      </property>
+      <property name="gridStyle">
+       <enum>Qt::SolidLine</enum>
+      </property>
+      <property name="sortingEnabled">
+       <bool>true</bool>
+      </property>
+      <property name="rowCount">
+       <number>0</number>
       </property>
       <attribute name="horizontalHeaderMinimumSectionSize">
        <number>19</number>
@@ -876,9 +865,12 @@ QPushButton:checked{
       <attribute name="horizontalHeaderDefaultSectionSize">
        <number>76</number>
       </attribute>
+      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+       <bool>true</bool>
+      </attribute>
       <column>
        <property name="text">
-        <string>Nombre Proyecto</string>
+        <string>Nombre</string>
        </property>
       </column>
       <column>
@@ -893,17 +885,17 @@ QPushButton:checked{
       </column>
       <column>
        <property name="text">
-        <string>Tipologia [m2]</string>
+        <string>Superficie</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Tipologia</string>
        </property>
       </column>
       <column>
        <property name="text">
         <string>Precio [UF]</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Amoblado [$]</string>
        </property>
       </column>
       <column>
@@ -921,31 +913,32 @@ QPushButton:checked{
         <string>Cap Rate</string>
        </property>
       </column>
-      <column>
-       <property name="text">
-        <string>R. Total</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>R. Flujo</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>R. Amotizacion</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>R. Plusvalia</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Utilidades</string>
-       </property>
-      </column>
+     </widget>
+     <widget class="QPushButton" name="boton_evaluar_proyecto">
+      <property name="geometry">
+       <rect>
+        <x>580</x>
+        <y>510</y>
+        <width>201</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton{
+	background-color: #0056D2;
+	color: white;
+	border:none;
+	height: 30px;
+	font-weight:bold;
+	border-radius:10px;
+}</string>
+      </property>
+      <property name="text">
+       <string>Generar Evaluación</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
      </widget>
     </widget>
    </widget>
@@ -956,7 +949,7 @@ QPushButton:checked{
     <property name="geometry">
      <rect>
       <x>360</x>
-      <y>15</y>
+      <y>5</y>
       <width>71</width>
       <height>71</height>
      </rect>

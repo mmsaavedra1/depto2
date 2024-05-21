@@ -1,6 +1,6 @@
 import requests
 import pandas as pd
-
+import json
 from datetime import date
 
 
@@ -36,14 +36,27 @@ def calcular_dividendo(precio_compra: int, porcentaje_pie: str, cae: str, plazo_
     return prestamo*cae_mensual/factor
 
 
-def obtener_uf_actualizada():
+def obtener_uf_actualizada(ruta ='../db/uf_historica.json'):
     """
     Funcion que retorna el valor actual de la uf/clp
     """
+    with open(ruta, 'r') as file:
+        datos = json.load(file)
+
     hoy = date.today()
-    url = f"https://mindicador.cl/api/uf/{str(hoy.day).zfill(2)}-{str(hoy.month).zfill(2)}-{hoy.year}"
+    hoy = f"{str(hoy.day).zfill(2)}-{str(hoy.month).zfill(2)}-{hoy.year}"
+
+    if hoy not in datos.keys():
+        hoy = date.today()
+        url = f"https://mindicador.cl/api/uf/{str(hoy.day).zfill(2)}-{str(hoy.month).zfill(2)}-{hoy.year}"
+        uf = requests.get(url).json()['serie'][0]['valor']
+        hoy = f"{str(hoy.day).zfill(2)}-{str(hoy.month).zfill(2)}-{hoy.year}"
+        with open(ruta, 'w') as file:
+            json.dump({hoy:uf}, file, indent=4)
+    else:
+        uf = datos[hoy]
     
-    return requests.get(url).json()['serie'][0]['valor']
+    return int(uf)
 
 
 def obtener_cap_rate(arriendo: float, precio_compra: int):
@@ -59,7 +72,7 @@ def obtener_arriendo():
     TODO:
     Funcion que obtiene el vaor del arriendo segun el approach de la IA
     """
-    return 351500/37000
+    return 280000/37000
 
 
 def obtener_gap_arriendo_dividendo(arriendo: float, dividendo: float,
@@ -175,6 +188,14 @@ def anualizar_tasa(tasa: float, plazo: int):
         signo = -1
 
     return signo*((1+abs(tasa))**(1/plazo)-1)
+
+
+def obtener_comunas(dir: str):
+    """
+    Funcion que obtiene las comunas que podemos analizar segun la BBDD
+    """
+    from os import listdir
+    return [comuna.split('_')[0] for comuna in listdir(dir) if (".xlsx" in comuna) and ("$" not in comuna)]
 
 
 if __name__ == '__main__':
