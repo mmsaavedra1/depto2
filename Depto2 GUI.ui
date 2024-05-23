@@ -145,15 +145,15 @@ QPushButton:checked{
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="page">
      <widget class="QFrame" name="widget_datos_evaluacion">
       <property name="geometry">
        <rect>
-        <x>350</x>
+        <x>260</x>
         <y>390</y>
-        <width>451</width>
+        <width>681</width>
         <height>151</height>
        </rect>
       </property>
@@ -424,8 +424,8 @@ QPushButton:checked{
       <widget class="QLabel" name="etiq_cae_4">
        <property name="geometry">
         <rect>
-         <x>260</x>
-         <y>90</y>
+         <x>470</x>
+         <y>30</y>
          <width>71</width>
          <height>16</height>
         </rect>
@@ -442,14 +442,45 @@ QPushButton:checked{
       <widget class="QLineEdit" name="uf">
        <property name="geometry">
         <rect>
-         <x>350</x>
-         <y>90</y>
+         <x>540</x>
+         <y>30</y>
          <width>81</width>
          <height>20</height>
         </rect>
        </property>
        <property name="text">
         <string/>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="dividendo">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="geometry">
+        <rect>
+         <x>350</x>
+         <y>90</y>
+         <width>81</width>
+         <height>20</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="etiq_cae_5">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>90</y>
+         <width>71</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Dividendo</string>
        </property>
       </widget>
      </widget>

@@ -153,6 +153,9 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         pie = calcular_pie(precio_compra, porcentaje_pie)
         # 1º calcular el dividendo si no fue entregado
         dividendo = calcular_dividendo(precio_compra, porcentaje_pie, cae, plazo_credito)
+        self.dividendo.setText(f"{round(dividendo*uf):,.0f}".replace(',', '.'))
+        self.dividendo
+        
         # 2º definir el capital inicial del inversionista
         capital = pie + ggoo
         # 3º calcaular la tabla de amortizacion 
