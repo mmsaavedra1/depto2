@@ -1,6 +1,7 @@
 from depto2_gui import Ui_MainWindow
-from PySide6.QtGui import Qt, QIcon, QFont
+from PySide6.QtGui import Qt, QIcon, QFont, QDesktopServices
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QMessageBox
+from PySide6.QtCore import QUrl
 from PySide6 import QtCharts
 
 from utils.calculo_metricas import *
@@ -25,6 +26,16 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         self.tabla_proyectos.setColumnWidth(0, 170)
         header = self.tabla_proyectos.horizontalHeader()
         header.setDefaultAlignment(Qt.AlignLeft)
+        # Doble Click y abrir hipervinculo
+        self.tabla_proyectos.cellDoubleClicked.connect(self.cell_double_clicked)
+
+        # Seteo de opciones avanzadas de calculadora
+        self.avanzado.stateChanged.connect(self.switch_avanced)
+        self.frame_avanzado.hide()
+
+        # Seteo de la tabla de dfl2
+        self.tabla_dfl2.setRowCount(2)
+        self.tabla_dfl2.itemChanged.connect(self.actualizar_tabla_dfl2_segun_anio)
 
         # Seteo de las comunas proyectos
         comunas = sorted(obtener_comunas('db/'))
@@ -45,12 +56,28 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         self.boton_evaluar_proyecto.clicked.connect(self.evaluar_proyecto)
 
 
-     # Metodos que mueven las diferente paginas del stack
+    # Metodos que mueven las diferente paginas del stack
     def switch_to_evaluacion(self):
         self.widget_pila.setCurrentIndex(0)
 
+
     def switch_to_proyectos(self):
         self.widget_pila.setCurrentIndex(1)
+
+
+    # Metodos que despliegan los calculos avanzados
+    def switch_avanced(self, state):
+        if state == 2:  # Si el checkbox está seleccionado
+            self.frame_avanzado.show()
+        else:  # Si el checkbox no está seleccionado
+            self.frame_avanzado.hide()
+        
+
+    # Metodo que reacciona al doble click sobre las celdas
+    def cell_double_clicked(self, row, column):
+        url = self.tabla_proyectos.item(row, column).text()
+        if column == 9:
+            QDesktopServices.openUrl(QUrl(url))
 
 
     # Metodo que evalua un proyecto seleccionado
@@ -112,8 +139,9 @@ class Depto2App(QMainWindow, Ui_MainWindow):
                     precio = f"UF{df_comuna.loc[row, 'precio [UF]']:,.0f}".replace(',','.')
                     arriendo = f"${df_comuna.loc[row, 'Precio Arriendo Manual - IA Ponderado']:,.0f}".replace(',','.')
                     arriendo_amoblado = f"${df_comuna.loc[row, 'Arriendo Amoblado Manual - IA Ponderado']:,.0f}".replace(',','.')
-                    cap_rate = f"%{df_comuna.loc[row, 'Cap Rate Manual - IA Ponderado']:,.2f}".replace(".", ',')
-                    
+                    #cap_rate = f"%{df_comuna.loc[row, 'Cap Rate Manual - IA Ponderado']:,.2f}".replace(".", ',')
+                    url = df_comuna.loc[row, 'url']
+
                     # Filtro rango de precios
                     precio_min = 0 if self.precio_3.text() == "" else int(self.precio_3.text())
                     precio_max = 99999999 if self.precio_4.text() == "" else int(self.precio_4.text())
@@ -131,7 +159,8 @@ class Depto2App(QMainWindow, Ui_MainWindow):
                         self.tabla_proyectos.setItem(fila_tabla, 5, QTableWidgetItem(precio))
                         self.tabla_proyectos.setItem(fila_tabla, 6, QTableWidgetItem(arriendo)) 
                         self.tabla_proyectos.setItem(fila_tabla, 7, QTableWidgetItem(arriendo_amoblado))
-                        self.tabla_proyectos.setItem(fila_tabla, 8, QTableWidgetItem(cap_rate))
+                        #self.tabla_proyectos.setItem(fila_tabla, 8, QTableWidgetItem(cap_rate))
+                        self.tabla_proyectos.setItem(fila_tabla, 8, QTableWidgetItem(url))
 
 
     # Crear valores para desplegar en grafico
@@ -197,13 +226,27 @@ class Depto2App(QMainWindow, Ui_MainWindow):
 
         return datos, cap_rate
 
+    
+    # Obtener valores segun el año de analisis
+    def actualizar_tabla_dfl2_segun_anio(self, item):
+        if item.row() == 1 and item.column() == 0:
+            print(f"Enter pressed on cell {item.row()},{item.column()} with text: {item.text()}")
+            indice = self.tabla_dfl2.item(1, 0).text()
+            if indice != "":
+                self.actualizar_tabla_dfl2(indice=indice)
+
 
     # Obtener valores de recomendacion de venta
-    def actualizar_tabla_dfl2(self):
+    def actualizar_tabla_dfl2(self, indice=None):
         values, cap_rate = self.crear_datos_dfl2()
         plazo_venta, rentabilidad_flujos, rentabilidad_plusvalia, rentabilidad_amortizacion, roi_sin_venta, roi_con_venta, utilidad_venta = zip(*values)
 
-        indice_max = roi_con_venta.index(max(roi_con_venta))
+        if indice==None:
+            indice_max = roi_con_venta.index(max(roi_con_venta))
+            row = 0
+        else:
+            indice_max = int(indice)-1
+            row = 1
 
         max_ano_venta = plazo_venta[indice_max]
         max_rent_total = roi_con_venta[indice_max]
@@ -212,15 +255,17 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         max_rent_amortizacion = rentabilidad_amortizacion[indice_max]
         max_utilidad = utilidad_venta[indice_max]
 
-        self.tabla_dfl2.insertRow(self.tabla_dfl2.rowCount())
-        self.tabla_dfl2.setItem(0, 0, QTableWidgetItem(str(max_ano_venta)))
-        self.tabla_dfl2.setItem(0, 1, QTableWidgetItem(f"%{round(cap_rate*100,2)}"))
-        self.tabla_dfl2.setItem(0, 2, QTableWidgetItem(f"%{round(max_rent_total*100,2)}"))
-        self.tabla_dfl2.setItem(0, 3, QTableWidgetItem(f"%{round(max_rent_flujo*100,2)}"))
-        self.tabla_dfl2.setItem(0, 4, QTableWidgetItem(f"%{round(max_rent_plusvalia*100,2)}"))
-        self.tabla_dfl2.setItem(0, 5, QTableWidgetItem(f"%{round(max_rent_amortizacion*100,2)}"))
-        self.tabla_dfl2.setItem(0, 6, QTableWidgetItem(f"UF{round(max_utilidad)}"))
-        
+        print("indice", indice_max)
+        print("anio", max_ano_venta)
+
+        self.tabla_dfl2.setItem(row, 0, QTableWidgetItem(str(max_ano_venta)))
+        self.tabla_dfl2.setItem(row, 1, QTableWidgetItem(f"%{round(cap_rate*100,2)}"))
+        self.tabla_dfl2.setItem(row, 2, QTableWidgetItem(f"%{round(max_rent_total*100,2)}"))
+        self.tabla_dfl2.setItem(row, 3, QTableWidgetItem(f"%{round(max_rent_flujo*100,2)}"))
+        self.tabla_dfl2.setItem(row, 4, QTableWidgetItem(f"%{round(max_rent_plusvalia*100,2)}"))
+        self.tabla_dfl2.setItem(row, 5, QTableWidgetItem(f"%{round(max_rent_amortizacion*100,2)}"))
+        self.tabla_dfl2.setItem(row, 6, QTableWidgetItem(f"UF{round(max_utilidad)}"))
+
     
     # Manejar el grafico de torta
     def actualizar_grafico_dfl2(self):
