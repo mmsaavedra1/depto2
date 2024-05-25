@@ -33,6 +33,11 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         self.avanzado.stateChanged.connect(self.switch_avanced)
         self.frame_avanzado.hide()
 
+        # Habilitar los comboBox de comunas
+        self.comuna_1.stateChanged.connect(self.bloqueo_comuna_1)
+        self.comuna_2.stateChanged.connect(self.bloqueo_comuna_2)
+        self.comuna_3.stateChanged.connect(self.bloqueo_comuna_3)
+
         # Seteo de la tabla de dfl2
         self.tabla_dfl2.setRowCount(2)
         self.tabla_dfl2.itemChanged.connect(self.actualizar_tabla_dfl2_segun_anio)
@@ -46,11 +51,16 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         # Seteo de las comunas evaluacion
         self.lista_comunas.addItems(comunas)
 
+        # Botones de cabecera
         self.boton_evaluacion.clicked.connect(self.switch_to_evaluacion)
         self.boton_proyectos.clicked.connect(self.switch_to_proyectos)
+        
+        # Bonton Listar Proyectos
         self.boton_generar_proyectos.clicked.connect(self.actualizar_tabla_proyectos)
+
+        # Boton Generar Evaluacion
         self.boton_generar_evaluacion.clicked.connect(self.actualizar_grafico_dfl2)
-        self.boton_generar_evaluacion.clicked.connect(self.actualizar_tabla_dfl2)
+        self.boton_generar_evaluacion.clicked.connect(self.actualizar_tabla_dfl2_boton_generar)
 
         # Revisa que se seleccione un proyecto para evaluar
         self.boton_evaluar_proyecto.clicked.connect(self.evaluar_proyecto)
@@ -63,6 +73,29 @@ class Depto2App(QMainWindow, Ui_MainWindow):
 
     def switch_to_proyectos(self):
         self.widget_pila.setCurrentIndex(1)
+
+    # Metodos que bloquean combo box de comuna
+    def bloqueo_comuna_1(self, state):
+        if state == 2:  # Si el checkbox está seleccionado
+            self.lista_comunas_2.setEnabled(True)
+        else:  # Si el checkbox no está seleccionado
+            self.lista_comunas_2.setEnabled(False)
+
+
+    # Metodos que bloquean combo box de comuna
+    def bloqueo_comuna_2(self, state):
+        if state == 2:  # Si el checkbox está seleccionado
+            self.lista_comunas_3.setEnabled(True)
+        else:  # Si el checkbox no está seleccionado
+            self.lista_comunas_3.setEnabled(False)
+
+
+    # Metodos que bloquean combo box de comuna
+    def bloqueo_comuna_3(self, state):
+        if state == 2:  # Si el checkbox está seleccionado
+            self.lista_comunas_4.setEnabled(True)
+        else:  # Si el checkbox no está seleccionado
+            self.lista_comunas_4.setEnabled(False)
 
 
     # Metodos que despliegan los calculos avanzados
@@ -107,7 +140,7 @@ class Depto2App(QMainWindow, Ui_MainWindow):
             self.lista_comunas.setCurrentText(valores_fila_seleccionada[1])
 
             self.actualizar_grafico_dfl2()
-            self.actualizar_tabla_dfl2()
+            self.actualizar_tabla_dfl2_boton_generar()  # La borra y vuelve a cargar
             
         else:
             QMessageBox.warning(self, "Advertencia", "Por favor, selecciona una fila completa para continuar.")
@@ -118,12 +151,20 @@ class Depto2App(QMainWindow, Ui_MainWindow):
 
         # Limpiar la tabla
         self.tabla_proyectos.setRowCount(0)
-        
+
         # Filtrar comunas
-        comunas = set([
-            self.lista_comunas_2.currentText(),
-            self.lista_comunas_3.currentText(),
-            self.lista_comunas_4.currentText()])
+        comunas = set()
+
+        # Obtener comunas habilitadas
+        if self.comuna_1.isChecked() == True:
+            comuna_1 = self.lista_comunas_2.currentText()
+            comunas.add(comuna_1)
+        if self.comuna_2.isChecked() == True:
+            comuna_2 = self.lista_comunas_3.currentText()
+            comunas.add(comuna_2)
+        if self.comuna_3.isChecked() == True:
+            comuna_3 = self.lista_comunas_4.currentText()
+            comunas.add(comuna_3)
 
         for comuna_ in comunas:
 
@@ -229,11 +270,26 @@ class Depto2App(QMainWindow, Ui_MainWindow):
     
     # Obtener valores segun el año de analisis
     def actualizar_tabla_dfl2_segun_anio(self, item):
+        # Desconecta la señal para evitar recursion
+        self.tabla_dfl2.itemChanged.disconnect(self.actualizar_tabla_dfl2_segun_anio)
+
         if item.row() == 1 and item.column() == 0:
-            print(f"Enter pressed on cell {item.row()},{item.column()} with text: {item.text()}")
             indice = self.tabla_dfl2.item(1, 0).text()
             if indice != "":
                 self.actualizar_tabla_dfl2(indice=indice)
+
+        # Conecta la señal para la futura ejecucion
+        self.tabla_dfl2.itemChanged.connect(self.actualizar_tabla_dfl2_segun_anio)
+
+
+    # Actualizar tabla DFL2 si se aprieta el boton
+    def actualizar_tabla_dfl2_boton_generar(self):
+        # Actualizar la tabla dfl2 a cero
+        for row in range(2):
+            for column in range(self.tabla_dfl2.columnCount()):
+                self.tabla_dfl2.setItem(row, column, QTableWidgetItem(""))
+
+        self.actualizar_tabla_dfl2(indice=None)
 
 
     # Obtener valores de recomendacion de venta
@@ -254,9 +310,6 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         max_rent_plusvalia = rentabilidad_plusvalia[indice_max]
         max_rent_amortizacion = rentabilidad_amortizacion[indice_max]
         max_utilidad = utilidad_venta[indice_max]
-
-        print("indice", indice_max)
-        print("anio", max_ano_venta)
 
         self.tabla_dfl2.setItem(row, 0, QTableWidgetItem(str(max_ano_venta)))
         self.tabla_dfl2.setItem(row, 1, QTableWidgetItem(f"%{round(cap_rate*100,2)}"))
@@ -306,15 +359,6 @@ class Depto2App(QMainWindow, Ui_MainWindow):
             axis_y_min =  min(roi_con_venta*100, roi_sin_venta*100, rentabilidad_plusvalia*100, rentabilidad_amortizacion*100, rentabilidad_flujos*100, axis_y_min)
             axis_y_max =  max(roi_con_venta*100, roi_sin_venta*100, rentabilidad_plusvalia*100, rentabilidad_amortizacion*100, rentabilidad_flujos*100, axis_y_max)
         
-        #rentabilidad_total_venta_series.append(zip(plazo_venta, roi_con_venta))
-        #rentabilidad_total_sin_venta_series.append(zip(plazo_venta, roi_sin_venta))
-        #rentabilidad_plusvalia_series.append(zip(plazo_venta, rentabilidad_plusvalia))
-        #rentabilidad_amortizacion_series.append(zip(plazo_venta, rentabilidad_amortizacion))
-        #rentabilidad_flujos_series.append(zip(plazo_venta, rentabilidad_flujos))
-        #years = [str(x) for x in plazo_venta]
-        #axis_y_min =  min(roi_con_venta + roi_sin_venta + rentabilidad_plusvalia + rentabilidad_amortizacion + rentabilidad_flujos)
-        #axis_y_max =  max(roi_con_venta + roi_sin_venta + rentabilidad_plusvalia + rentabilidad_amortizacion + rentabilidad_flujos)
-
         chart.addSeries(rentabilidad_total_venta_series)
         chart.addSeries(rentabilidad_total_sin_venta_series)
         chart.addSeries(rentabilidad_plusvalia_series)

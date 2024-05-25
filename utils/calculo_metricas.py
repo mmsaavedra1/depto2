@@ -9,8 +9,8 @@ def obtener_cae_mensual(cae: str):
     Funcion auxiliar para obtener el cae "mensual" en funcion 
     del valor anualizado
     """
-    cae = float(str(cae).replace(',', '.'))
-    return (1+cae/100)**(1/12)-1
+    cae_ = float(str(cae).replace(',', '.'))
+    return (1+cae_/100)**(1/12)-1
 
 
 def calcular_pie(precio_compra: int, porcentaje_pie: str):
