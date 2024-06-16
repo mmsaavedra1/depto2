@@ -1,5 +1,5 @@
 from depto2_gui import Ui_MainWindow
-from PySide6.QtGui import Qt, QIcon, QFont, QDesktopServices
+from PySide6.QtGui import Qt, QIcon, QFont, QDesktopServices, QPen, QColor
 from PySide6.QtWidgets import QMainWindow, QTableWidgetItem, QMessageBox
 from PySide6.QtCore import QUrl
 from PySide6 import QtCharts
@@ -19,7 +19,11 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         #Seteo de parametros
         self.pie.setText('20')
         self.plazo.setText('30')
-        self.cae.setText('5')
+        self.cae.setText('5.5')
+        self.cae_calculadora.setText('5.5')
+        self.financiamiento.setText('80')
+        self.ggoo.setText('1000000')
+
         self.uf.setText(str(obtener_uf_actualizada(ruta='db/uf_historica.json')))
 
         # Seteo de la tabla proyectos
@@ -42,14 +46,35 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         self.tabla_dfl2.setRowCount(2)
         self.tabla_dfl2.itemChanged.connect(self.actualizar_tabla_dfl2_segun_anio)
 
-        # Seteo de las comunas proyectos
-        comunas = sorted(obtener_comunas('db/'))
-        self.lista_comunas_2.addItems(comunas)
-        self.lista_comunas_3.addItems(comunas)
-        self.lista_comunas_4.addItems(comunas)
+        # Seteo de las regiones/comunas proyectos
+        regiones = sorted(obtener_regiones('db/Proyectos'))
 
-        # Seteo de las comunas evaluacion
+        self.lista_regiones.addItems(regiones)
+        self.lista_regiones.currentIndexChanged.connect(self.actualizar_comunas)
+
+        comunas = sorted(obtener_comunas(f'db/Proyectos/{self.lista_regiones.currentText()}'))
+
         self.lista_comunas.addItems(comunas)
+        self.lista_comunas.currentIndexChanged.connect(self.actualizar_plusvalia_comunas)
+
+        self.lista_regiones_2.addItems(regiones)
+        self.lista_regiones_2.currentIndexChanged.connect(self.actualizar_comunas_2)
+
+        comunas_2 = sorted(obtener_comunas(f'db/Proyectos/{self.lista_regiones_2.currentText()}'))
+
+        self.lista_comunas_2.addItems(comunas_2)
+        self.lista_comunas_2.currentIndexChanged.connect(self.actualizar_plusvalia_comunas_2)
+        self.lista_comunas_3.addItems(comunas_2)
+        self.lista_comunas_3.currentIndexChanged.connect(self.actualizar_plusvalia_comunas_3)
+        self.lista_comunas_4.addItems(comunas_2)
+        self.lista_comunas_4.currentIndexChanged.connect(self.actualizar_plusvalia_comunas_4)
+
+        self.plusvalia_1.setText(obtener_plusvalia(self.lista_comunas.currentText()))
+        self.plusvalia_2.setText(obtener_plusvalia(self.lista_comunas_2.currentText()))
+        self.plusvalia_3.setText(obtener_plusvalia(self.lista_comunas_3.currentText()))
+        self.plusvalia_4.setText(obtener_plusvalia(self.lista_comunas_4.currentText()))
+
+       
 
         # Botones de cabecera
         self.boton_evaluacion.clicked.connect(self.switch_to_evaluacion)
@@ -73,6 +98,36 @@ class Depto2App(QMainWindow, Ui_MainWindow):
 
     def switch_to_proyectos(self):
         self.widget_pila.setCurrentIndex(1)
+
+    # Metodo que actualiza el ComboBox
+    def actualizar_comunas(self):
+        self.lista_comunas.clear()
+    
+        comunas = sorted(obtener_comunas(f'db/Proyectos/{self.lista_regiones.currentText()}'))
+        self.lista_comunas.addItems(comunas)
+
+
+    def actualizar_comunas_2(self):
+        self.lista_comunas_2.clear()
+        self.lista_comunas_3.clear()
+        self.lista_comunas_4.clear()
+
+        comunas = sorted(obtener_comunas(f'db/Proyectos/{self.lista_regiones_2.currentText()}'))
+        self.lista_comunas_2.addItems(comunas)
+        self.lista_comunas_3.addItems(comunas)
+        self.lista_comunas_4.addItems(comunas)
+
+
+    # Metodo que actualiza las plsuvalias
+    def actualizar_plusvalia_comunas(self):
+        self.plusvalia_1.setText(obtener_plusvalia(self.lista_comunas.currentText()))
+    def actualizar_plusvalia_comunas_2(self):
+        self.plusvalia_2.setText(obtener_plusvalia(self.lista_comunas_2.currentText()))
+    def actualizar_plusvalia_comunas_3(self):
+        self.plusvalia_3.setText(obtener_plusvalia(self.lista_comunas_3.currentText()))
+    def actualizar_plusvalia_comunas_4(self):
+        self.plusvalia_4.setText(obtener_plusvalia(self.lista_comunas_4.currentText()))
+
 
     # Metodos que bloquean combo box de comuna
     def bloqueo_comuna_1(self, state):
@@ -137,7 +192,9 @@ class Depto2App(QMainWindow, Ui_MainWindow):
             self.precio_2.setText(valores_fila_seleccionada[5].strip('UF').replace('.',''))
             self.arriendo_proyecto.setText(valores_fila_seleccionada[6].strip('$').replace('.',''))
             self.nombre_proyecto.setText(valores_fila_seleccionada[0])
+            self.lista_regiones.setCurrentText(self.lista_regiones_2.currentText())
             self.lista_comunas.setCurrentText(valores_fila_seleccionada[1])
+            self.plusvalia_1.setText(obtener_plusvalia(valores_fila_seleccionada[1]))
 
             self.actualizar_grafico_dfl2()
             self.actualizar_tabla_dfl2_boton_generar()  # La borra y vuelve a cargar
@@ -167,17 +224,15 @@ class Depto2App(QMainWindow, Ui_MainWindow):
             comunas.add(comuna_3)
 
         for comuna_ in comunas:
-
-            if f'{comuna_}_dpto_ventas_resumen_2024-05.xlsx' in listdir('db'):
-                df_comuna = pd.read_excel(f'db/{comuna_}_dpto_ventas_resumen_2024-05.xlsx')
-
+            if f'{comuna_}_dpto_ventas_resumen_comuna_2024-05.xlsx' in listdir(f'db/Proyectos/{self.lista_regiones_2.currentText()}'):
+                df_comuna = pd.read_excel(f'db/Proyectos/{self.lista_regiones_2.currentText()}/{comuna_}_dpto_ventas_resumen_comuna_2024-05.xlsx')
                 for row in range(df_comuna.shape[0]):
                     titulo = df_comuna.loc[row, 'Titulo']
                     comuna = comuna_
                     direccion = df_comuna.loc[row, 'Direccion']
                     superficie = " ".join(df_comuna.loc[row, 'Superficie Útil'].split(' ')[:2])
                     tipologia = f"{df_comuna.loc[row, 'Habitaciones'].split(' ')[0]}D+{df_comuna.loc[row, 'Banos'].split(' ')[0]}B"
-                    precio = f"UF{df_comuna.loc[row, 'precio [UF]']:,.0f}".replace(',','.')
+                    precio = f"UF{df_comuna.loc[row, 'Precio [UF]']:,.0f}".replace(',','.')
                     arriendo = f"${df_comuna.loc[row, 'Precio Arriendo Manual - IA Ponderado']:,.0f}".replace(',','.')
                     arriendo_amoblado = f"${df_comuna.loc[row, 'Arriendo Amoblado Manual - IA Ponderado']:,.0f}".replace(',','.')
                     #cap_rate = f"%{df_comuna.loc[row, 'Cap Rate Manual - IA Ponderado']:,.2f}".replace(".", ',')
@@ -186,7 +241,7 @@ class Depto2App(QMainWindow, Ui_MainWindow):
                     # Filtro rango de precios
                     precio_min = 0 if self.precio_3.text() == "" else int(self.precio_3.text())
                     precio_max = 99999999 if self.precio_4.text() == "" else int(self.precio_4.text())
-                    precio_ = int(df_comuna.loc[row, 'precio [UF]'])
+                    precio_ = int(df_comuna.loc[row, 'Precio [UF]'])
                     
                     if precio_min <= precio_ and precio_ <= precio_max:
                         fila_tabla = self.tabla_proyectos.rowCount()
@@ -216,8 +271,8 @@ class Depto2App(QMainWindow, Ui_MainWindow):
             self.uf.setText(str(obtener_uf_actualizada(ruta='db/uf_historica.json')))
         uf = int(self.uf.text())
         
-        ggoo = 1e6/uf
-        plusvalia_hist = '3.5'
+        ggoo = int(self.ggoo.text())/uf
+        plusvalia_hist = self.plusvalia_1.text()
 
         # 0º calcular el pie
         pie = calcular_pie(precio_compra, porcentaje_pie)
@@ -344,11 +399,31 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         rentabilidad_amortizacion_series.setName('R. Amortizacion')
         rentabilidad_flujos_series.setName('R. Flujos')
 
+        # Hacer mas gruesa la linea
+        grosor = 4
+        pen_1 = QPen(QColor(32, 159, 223))
+        pen_1.setWidth(grosor)
+        rentabilidad_total_venta_series.setPen(pen_1)
+
+        pen_2 = QPen(QColor(153, 202, 83))
+        pen_2.setWidth(grosor)
+        rentabilidad_total_sin_venta_series.setPen(pen_2)
+
+        pen_3 = QPen(QColor(246, 166, 37))
+        pen_3.setWidth(grosor)
+        rentabilidad_plusvalia_series.setPen(pen_3)
+
+        pen_4 = QPen(QColor(109, 95, 213))
+        pen_4.setWidth(grosor)
+        rentabilidad_amortizacion_series.setPen(pen_4)
+
+        pen_5 = QPen(QColor(191, 89, 62))
+        pen_5.setWidth(grosor)
+        rentabilidad_flujos_series.setPen(pen_5)
+
         axis_y_min = 0
         axis_y_max = 0
 
-
-        #plazo_venta, rentabilidad_flujos, rentabilidad_plusvalia, rentabilidad_amortizacion, roi_sin_venta, roi_con_venta, _ = zip(*values)
         for plazo_venta, rentabilidad_flujos, rentabilidad_plusvalia, rentabilidad_amortizacion, roi_sin_venta, roi_con_venta, _ in values:
             rentabilidad_total_venta_series.append(plazo_venta, roi_con_venta*100)
             rentabilidad_total_sin_venta_series.append(plazo_venta, roi_sin_venta*100)
@@ -358,13 +433,33 @@ class Depto2App(QMainWindow, Ui_MainWindow):
             years.append(str(plazo_venta))
             axis_y_min =  min(roi_con_venta*100, roi_sin_venta*100, rentabilidad_plusvalia*100, rentabilidad_amortizacion*100, rentabilidad_flujos*100, axis_y_min)
             axis_y_max =  max(roi_con_venta*100, roi_sin_venta*100, rentabilidad_plusvalia*100, rentabilidad_amortizacion*100, rentabilidad_flujos*100, axis_y_max)
-        
+
+
+        # Buscar el maximo valor para la vertical
+        plazo_venta, _, _, _, _, roi_con_venta, _ = zip(*values)
+        indice_max = roi_con_venta.index(max(roi_con_venta))
+        max_ano_venta = float(plazo_venta[indice_max])
+
+        vertical_line = QtCharts.QLineSeries()
+        vertical_line.setName("Año Venta")
+
+        vertical_pen = QPen(Qt.red)
+        vertical_pen.setStyle(Qt.DashLine)
+        vertical_pen.setWidth(grosor-1)
+        vertical_line.setPen(vertical_pen)
+
+        vertical_line.append(max_ano_venta, axis_y_min-2)
+        vertical_line.append(max_ano_venta, axis_y_max+2)
+
+        # Añadir las series de datos al grafico
         chart.addSeries(rentabilidad_total_venta_series)
         chart.addSeries(rentabilidad_total_sin_venta_series)
         chart.addSeries(rentabilidad_plusvalia_series)
         chart.addSeries(rentabilidad_amortizacion_series)
         chart.addSeries(rentabilidad_flujos_series)
-
+        chart.addSeries(vertical_line)
+        
+        # Crear ejes verticales y horizontales
         axis_x = QtCharts.QValueAxis()
         axis_x.setLabelFormat("%.0f")
         axis_x.setRange(float(years[0]), float(years[-1]))
@@ -375,6 +470,8 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         axis_y.setRange(-2+axis_y_min, axis_y_max+2)
         chart.addAxis(axis_y, Qt.AlignLeft)
 
+
+        # Ajustar datos al eje que corresponde
         rentabilidad_total_venta_series.attachAxis(axis_x)
         rentabilidad_total_venta_series.attachAxis(axis_y)
 
@@ -390,6 +487,9 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         rentabilidad_flujos_series.attachAxis(axis_x)
         rentabilidad_flujos_series.attachAxis(axis_y)
 
-        self.grafico_dfl2.setChart(chart)
+        vertical_line.attachAxis(axis_x)
+        vertical_line.attachAxis(axis_y)
 
+        # Añadir datos a la vista de Grafico
+        self.grafico_dfl2.setChart(chart)
 

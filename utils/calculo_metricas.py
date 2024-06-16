@@ -190,6 +190,14 @@ def anualizar_tasa(tasa: float, plazo: int):
     return signo*((1+abs(tasa))**(1/plazo)-1)
 
 
+def obtener_regiones(dir: str):
+    """
+    Funcion que obtiene las regiones que podemos analizar segun la BBDD
+    """
+    from os import listdir
+    return [region for region in listdir(dir) if (".DS" not in region) and ("$" not in region)]
+
+
 def obtener_comunas(dir: str):
     """
     Funcion que obtiene las comunas que podemos analizar segun la BBDD
@@ -197,6 +205,46 @@ def obtener_comunas(dir: str):
     from os import listdir
     return [comuna.split('_')[0] for comuna in listdir(dir) if (".xlsx" in comuna) and ("$" not in comuna)]
 
+
+def obtener_plusvalia(comuna_input: str):
+    """
+    Funcion que obtiene las plusvalia de la comuna de interes
+    """
+    import os
+    # Primero filtramos por el Excel Historico 
+    plusvalias = {}
+    regiones = [archivo for archivo in os.listdir('db/Plusvalias') if "xlsx" in archivo and "extra" not in archivo]
+    for region in regiones:
+        archivo_region = f"db/Plusvalias/{region}"
+        datos = pd.ExcelFile(archivo_region)
+        for comuna in datos.sheet_names:
+            comuna_df = pd.read_excel(archivo_region, sheet_name=comuna)
+            comuna_df = comuna_df[comuna_df['UF/m2'] != '-']
+            plusvalia =  comuna_df.tail(1).loc[:,'UF/m2'].item()/comuna_df.head(1).loc[:,'UF/m2'].item()
+            semestres = int(comuna_df.tail(1).loc[:,'Semestre'].item()[-2:]) -  int(comuna_df.head(1).loc[:,'Semestre'].item()[-2:])
+            plusvalias[comuna] = f"{100*(plusvalia**(1/semestres)-1):.2f}"
+    
+    # Segundo filtramos por la matriz de aproximacion
+    inicio = 2018
+    fin = 2023
+    df_comunas = pd.read_excel('db/Plusvalias/Plusvalias_extra.xlsx')
+    df_comunas['Plusvalia'] = df_comunas.apply(lambda row: f"{100*((row[fin]/row[inicio])**(1/(fin-inicio))-1):.2f}", axis=1)
+    df_comunas.sort_values(by='Comuna')
+
+    # Asignar valor segun corresponda
+    for region in sorted(os.listdir('db/Proyectos')):
+        if "DS" in region: continue
+        for comuna in sorted(os.listdir(f'db/Proyectos/{region}')):
+            if "xlsx" in comuna:
+                comuna = comuna.split("_")[0]
+                if comuna == comuna_input:
+                    if comuna in plusvalias.keys():
+                        return plusvalias[comuna]
+                    elif comuna in df_comunas['Comuna'].unique():
+                        return df_comunas.loc[df_comunas['Comuna'] == comuna, "Plusvalia"].item()
+                    else:
+                        return "2.0"
+                
 
 if __name__ == '__main__':
     # Valores ingresado por el usuario
