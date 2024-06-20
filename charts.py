@@ -6,6 +6,7 @@ from PySide6 import QtCharts
 
 from utils.calculo_metricas import *
 from os import listdir
+import json
 
 class Depto2App(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -20,9 +21,12 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         self.pie.setText('20')
         self.plazo.setText('30')
         self.cae.setText('5.5')
-        self.cae_calculadora.setText('5.5')
-        self.financiamiento.setText('80')
         self.ggoo.setText('1000000')
+
+        self.cae_calculadora.setText('5.5')
+        self.plazo_calculadora.setText('30')
+        self.ggoo_calculadora.setText('1000000')
+        self.financiamiento_calculadora.setText('80')
 
         self.uf.setText(str(obtener_uf_actualizada(ruta='db/uf_historica.json')))
 
@@ -30,6 +34,7 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         self.tabla_proyectos.setColumnWidth(0, 170)
         header = self.tabla_proyectos.horizontalHeader()
         header.setDefaultAlignment(Qt.AlignLeft)
+
         # Doble Click y abrir hipervinculo
         self.tabla_proyectos.cellDoubleClicked.connect(self.cell_double_clicked)
 
@@ -45,6 +50,9 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         # Seteo de la tabla de dfl2
         self.tabla_dfl2.setRowCount(2)
         self.tabla_dfl2.itemChanged.connect(self.actualizar_tabla_dfl2_segun_anio)
+
+        # Logica de boton amoblado
+        self.esta_amoblado.stateChanged.connect(self.switch_amoblado)
 
         # Seteo de las regiones/comunas proyectos
         regiones = sorted(obtener_regiones('db/Proyectos'))
@@ -159,7 +167,17 @@ class Depto2App(QMainWindow, Ui_MainWindow):
             self.frame_avanzado.show()
         else:  # Si el checkbox no está seleccionado
             self.frame_avanzado.hide()
-        
+
+    # Metodo que deshabilitada arriendo amoblado
+    def switch_amoblado(self, state):
+        if state == 2:  # Si el checkbox está seleccionado
+            self.arriendo_proyecto.setEnabled(False)
+            self.arriendo_amoblado.setEnabled(True)
+            self.gastos_amoblado.setEnabled(True)
+        else:  # Si el checkbox no está seleccionado
+            self.arriendo_proyecto.setEnabled(True)
+            self.arriendo_amoblado.setEnabled(False)        
+            self.gastos_amoblado.setEnabled(False)
 
     # Metodo que reacciona al doble click sobre las celdas
     def cell_double_clicked(self, row, column):
@@ -190,11 +208,13 @@ class Depto2App(QMainWindow, Ui_MainWindow):
             self.boton_evaluacion.setChecked(True)
 
             self.precio_2.setText(valores_fila_seleccionada[5].strip('UF').replace('.',''))
-            self.arriendo_proyecto.setText(valores_fila_seleccionada[6].strip('$').replace('.',''))
+            self.arriendo_proyecto.setText(valores_fila_seleccionada[7].strip('$').replace('.',''))
             self.nombre_proyecto.setText(valores_fila_seleccionada[0])
             self.lista_regiones.setCurrentText(self.lista_regiones_2.currentText())
             self.lista_comunas.setCurrentText(valores_fila_seleccionada[1])
             self.plusvalia_1.setText(obtener_plusvalia(valores_fila_seleccionada[1]))
+            self.gastos_amoblado.setText(valores_fila_seleccionada[6].strip('$').replace('.',''))
+            self.arriendo_amoblado.setText(valores_fila_seleccionada[10].strip('$').replace('.',''))
 
             self.actualizar_grafico_dfl2()
             self.actualizar_tabla_dfl2_boton_generar()  # La borra y vuelve a cargar
@@ -211,6 +231,11 @@ class Depto2App(QMainWindow, Ui_MainWindow):
 
         # Filtrar comunas
         comunas = set()
+
+        # Obtener diccionario de amoblados
+        ruta ='db/gastos_amoblado.json'
+        with open(ruta, 'r') as file:
+            datos_amoblado = json.load(file)
 
         # Obtener comunas habilitadas
         if self.comuna_1.isChecked() == True:
@@ -238,6 +263,40 @@ class Depto2App(QMainWindow, Ui_MainWindow):
                     #cap_rate = f"%{df_comuna.loc[row, 'Cap Rate Manual - IA Ponderado']:,.2f}".replace(".", ',')
                     url = df_comuna.loc[row, 'url']
 
+                    ########## Proceso de calculo de rentabilidades ########## 
+                
+                    # Calcular la maxima rentabilidad
+                    roi_con_venta, max_ano_venta = self.crear_datos_dfl2_listado(
+                        precio_compra=int(precio.strip('UF').replace('.','')), 
+                        porcentaje_pie=100-int(self.financiamiento_calculadora.text()), 
+                        cae=self.cae_calculadora.text(),
+                        plazo_credito=int(self.plazo_calculadora.text()),
+                        plusvalia_hist=obtener_plusvalia(comuna),
+                        ggoo=int(self.ggoo_calculadora.text()),
+                        arriendo_proyecto=arriendo.strip('$').replace('.','')
+                    )
+
+                    # Calcular la maxima rentabilidad amoblado
+                    roi_con_venta_amo, max_ano_venta_amo = self.crear_datos_dfl2_listado(
+                        precio_compra=int(precio.strip('UF').replace('.','')), 
+                        porcentaje_pie=100-int(self.financiamiento_calculadora.text()), 
+                        cae=self.cae_calculadora.text(),
+                        plazo_credito=int(self.plazo_calculadora.text()),
+                        plusvalia_hist=obtener_plusvalia(comuna),
+                        ggoo=int(self.ggoo_calculadora.text())+datos_amoblado[tipologia],
+                        arriendo_proyecto=arriendo_amoblado.strip('$').replace('.','')
+                    )
+
+                    # Castear datos
+                    max_rent = f"%{roi_con_venta*100:,.2f}".replace(".", ',')
+                    max_ano_venta = f"{max_ano_venta}"
+
+                    # Castear datos amoblado
+                    gastos_amoblado = f"${datos_amoblado[tipologia]:,.0f}".replace(",", '.')
+                    max_rent_amo = f"%{roi_con_venta_amo*100:,.2f}".replace(".", ',')
+                    max_ano_venta_amo = f"{max_ano_venta_amo}"
+                    ########## Proceso de calculo de rentabilidades ########## 
+
                     # Filtro rango de precios
                     precio_min = 0 if self.precio_3.text() == "" else int(self.precio_3.text())
                     precio_max = 99999999 if self.precio_4.text() == "" else int(self.precio_4.text())
@@ -253,25 +312,37 @@ class Depto2App(QMainWindow, Ui_MainWindow):
                         self.tabla_proyectos.setItem(fila_tabla, 3, QTableWidgetItem(superficie))
                         self.tabla_proyectos.setItem(fila_tabla, 4, QTableWidgetItem(tipologia))
                         self.tabla_proyectos.setItem(fila_tabla, 5, QTableWidgetItem(precio))
-                        self.tabla_proyectos.setItem(fila_tabla, 6, QTableWidgetItem(arriendo)) 
-                        self.tabla_proyectos.setItem(fila_tabla, 7, QTableWidgetItem(arriendo_amoblado))
+                        self.tabla_proyectos.setItem(fila_tabla, 6, QTableWidgetItem(gastos_amoblado))
+                        self.tabla_proyectos.setItem(fila_tabla, 7, QTableWidgetItem(arriendo)) 
+                        self.tabla_proyectos.setItem(fila_tabla, 8, QTableWidgetItem(max_rent))
+                        self.tabla_proyectos.setItem(fila_tabla, 9, QTableWidgetItem(max_ano_venta))
+                        self.tabla_proyectos.setItem(fila_tabla, 10, QTableWidgetItem(arriendo_amoblado))
+                        self.tabla_proyectos.setItem(fila_tabla, 11, QTableWidgetItem(max_rent_amo))
+                        self.tabla_proyectos.setItem(fila_tabla, 12, QTableWidgetItem(max_ano_venta_amo))
                         #self.tabla_proyectos.setItem(fila_tabla, 8, QTableWidgetItem(cap_rate))
-                        self.tabla_proyectos.setItem(fila_tabla, 8, QTableWidgetItem(url))
+                        self.tabla_proyectos.setItem(fila_tabla, 13, QTableWidgetItem(url))
 
 
     # Crear valores para desplegar en grafico
-    def crear_datos_dfl2(self):
+    def crear_datos_dfl2(self, cae=None):
+        """
+        Funcion que calcula las rentabilidades para un proyecto inmobiliario particular
+        """
        # Valores ingresado por el usuario
         precio_compra = int(self.precio_2.text())
         porcentaje_pie = self.pie.text()
-        cae = self.cae.text()
+        cae = self.cae.text() if cae is None else cae
         plazo_credito = int(self.plazo.text())
 
         if self.uf.text() == "":
             self.uf.setText(str(obtener_uf_actualizada(ruta='db/uf_historica.json')))
         uf = int(self.uf.text())
         
+        # Logica en funcion si está amoblado o no
         ggoo = int(self.ggoo.text())/uf
+        if self.esta_amoblado.isChecked():
+            ggoo += int(self.gastos_amoblado.text())/uf
+
         plusvalia_hist = self.plusvalia_1.text()
 
         # 0º calcular el pie
@@ -279,14 +350,17 @@ class Depto2App(QMainWindow, Ui_MainWindow):
         # 1º calcular el dividendo si no fue entregado
         dividendo = calcular_dividendo(precio_compra, porcentaje_pie, cae, plazo_credito)
         self.dividendo.setText(f"{round(dividendo*uf):,.0f}".replace(',', '.'))
-        self.dividendo
         
         # 2º definir el capital inicial del inversionista
         capital = pie + ggoo
         # 3º calcaular la tabla de amortizacion 
         tabla_amortizacion = calcular_tabla_amortizacion(precio_compra, porcentaje_pie, cae, plazo_credito)
         # 4º calcular arriendo del proyecto
-        arriendo_mercado_ia = int(self.arriendo_proyecto.text())/uf
+        if self.esta_amoblado.isChecked():
+            arriendo_mercado_ia = int(self.arriendo_amoblado.text())/uf
+        else:
+            arriendo_mercado_ia = int(self.arriendo_proyecto.text())/uf
+
         # 5º calcular el caprate del proyecto
         cap_rate = obtener_cap_rate(arriendo_mercado_ia, precio_compra)
         # 6º calcular el gap de arriendo y dividendo
@@ -321,6 +395,66 @@ class Depto2App(QMainWindow, Ui_MainWindow):
             datos.append([plazo_venta, rentabilidad_flujos, rentabilidad_plusvalia, rentabilidad_amortizacion, roi_sin_venta, roi_con_venta, utilidad_venta])
 
         return datos, cap_rate
+    
+
+    def crear_datos_dfl2_listado(self, precio_compra: int, porcentaje_pie: str, cae: str, plazo_credito:int, plusvalia_hist:str, ggoo:int, arriendo_proyecto:str):
+        """
+        Funcion que calcula las rentabilidades para cada proeycto del listado inicial
+        """
+        if self.uf.text() == "":
+            self.uf.setText(str(obtener_uf_actualizada(ruta='db/uf_historica.json')))
+        uf = int(self.uf.text())
+
+        # 0º calcular el pie
+        pie = calcular_pie(precio_compra, porcentaje_pie)
+        # 1º calcular el dividendo si no fue entregado
+        dividendo = calcular_dividendo(precio_compra, porcentaje_pie, cae, plazo_credito)
+        self.dividendo.setText(f"{round(dividendo*uf):,.0f}".replace(',', '.'))        
+        # 2º definir el capital inicial del inversionista
+        ggoo = ggoo/uf
+        capital = pie + ggoo
+        # 3º calcaular la tabla de amortizacion 
+        tabla_amortizacion = calcular_tabla_amortizacion(precio_compra, porcentaje_pie, cae, plazo_credito)
+        # 4º calcular arriendo del proyecto
+        arriendo_mercado_ia = int(arriendo_proyecto)/uf
+        # 5º calcular el caprate del proyecto
+        cap_rate = obtener_cap_rate(arriendo_mercado_ia, precio_compra)
+        # 6º calcular el gap de arriendo y dividendo
+        gap_mensual = obtener_gap_arriendo_dividendo(arriendo_mercado_ia, dividendo, 'UF', uf)
+
+        #### Esta parte es para construir el grafico de venta
+        max_ano_rentabilidad = 0
+        max_rentabilidad = 0
+
+        for i in range(1, plazo_credito):
+            plazo_venta = i
+            # 7º calcular rentabilidad por flujos
+            rentabilidad_flujos = obtener_rentabilidad_flujo(plazo_venta, gap_mensual*12, capital)
+            # 8º calcular rentabilidad por plusvalia
+            rentabilidad_plusvalia = obtener_rentabilidad_plusvalia(plazo_venta, plusvalia_hist, precio_compra, capital)
+            # 9º calcular rentabilidad por amortizacion
+            rentabilidad_amortizacion = obtener_rentabilidad_amortizacion(precio_compra, porcentaje_pie, plazo_venta, tabla_amortizacion, capital)
+            # 10º calcular utilidad sin venta
+            utilidad_no_venta = obtener_utilidades_no_venta(capital, rentabilidad_flujos, rentabilidad_plusvalia, rentabilidad_amortizacion)
+            # 11º calcular utilidad con venta
+            utilidad_venta = obtener_utilidades_venta(precio_compra, capital, rentabilidad_flujos, rentabilidad_plusvalia, rentabilidad_amortizacion)
+            # 11º calcular ROI sin venta
+            roi_sin_venta = obtener_roi(utilidad_no_venta, capital)
+            # 12º calcular ROI con venta
+            roi_con_venta = obtener_roi(utilidad_venta, capital)   
+            # 13º anualizar los valores
+            rentabilidad_flujos = anualizar_tasa(rentabilidad_flujos, plazo_venta)
+            rentabilidad_plusvalia = anualizar_tasa(rentabilidad_plusvalia, plazo_venta)
+            rentabilidad_amortizacion = anualizar_tasa(rentabilidad_amortizacion, plazo_venta)
+            roi_sin_venta = anualizar_tasa(roi_sin_venta, plazo_venta)
+            roi_con_venta = anualizar_tasa(roi_con_venta, plazo_venta)  
+
+            if roi_con_venta > max_rentabilidad:
+                max_ano_rentabilidad = i
+                max_rentabilidad = roi_con_venta
+        
+        return max_rentabilidad, max_ano_rentabilidad
+
 
     
     # Obtener valores segun el año de analisis
