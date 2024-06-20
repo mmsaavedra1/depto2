@@ -225,7 +225,7 @@ def obtener_plusvalia(comuna_input: str):
             plusvalias[comuna] = f"{100*(plusvalia**(1/semestres)-1):.2f}"
     
     # Segundo filtramos por la matriz de aproximacion
-    inicio = 2018
+    inicio = 2017
     fin = 2023
     df_comunas = pd.read_excel('db/Plusvalias/Plusvalias_extra.xlsx')
     df_comunas['Plusvalia'] = df_comunas.apply(lambda row: f"{100*((row[fin]/row[inicio])**(1/(fin-inicio))-1):.2f}", axis=1)
